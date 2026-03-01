@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureLab | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0a0e17;
+            --bg-card: #111827;
+            --bg-input: #1a2234;
+            --border: #1e2d4a;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --success: #10b981;
+            --text-primary: #e2e8f0;
+            --text-muted: #64748b;
+            --text-dim: #475569;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-deep);
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .topbar-brand .icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            padding: 6px 14px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            color: var(--success);
+        }
+
+        .nav-link {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-input);
+        }
+
+        .nav-link.danger { color: #ef4444; }
+        .nav-link.danger:hover { background: rgba(239, 68, 68, 0.1); }
+
+        .main-content {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 24px;
+        }
+
+        .welcome-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px;
+            text-align: center;
+        }
+
+        .welcome-card h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .welcome-card p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 32px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .status-item {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+        }
+
+        .status-item .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+        }
+
+        .status-item .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--success);
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-brand">
+            <div class="icon">🔐</div>
+            SecureLab
+        </div>
+        <div class="topbar-right">
+            <span class="user-badge">{{ role }} · {{ username }}</span>
+            {% if role == 'admin' %}
+                <a href="/logs" class="nav-link">📊 Attack Logs</a>
+            {% endif %}
+            <a href="/logout" class="nav-link danger">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="welcome-card">
+            <h1>Bienvenido, {{ username }} 👋</h1>
+            <p>Has iniciado sesión correctamente en el laboratorio de seguridad.</p>
+
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="label">Estado</div>
+                    <div class="value">● Autenticado</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">Rol</div>
+                    <div class="value">{{ role | upper }}</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">Sesión</div>
+                    <div class="value">Activa</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">Servidor</div>
+                    <div class="value">localhost:5000</div>
+                </div>
+            </div>
+
+            {% if role == 'admin' %}
+            <div style="margin-top: 32px;">
+                <a href="/logs" style="
+                    display: inline-block;
+                    padding: 12px 28px;
+                    background: linear-gradient(135deg, #3b82f6, #2563eb);
+                    border-radius: 10px;
+                    color: white;
+                    text-decoration: none;
+                    font-weight: 600;
+                    transition: all 0.2s;
+                ">📊 Ver Logs de Ataque</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

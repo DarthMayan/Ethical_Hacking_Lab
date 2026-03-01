@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureLab | Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0a0e17;
+            --bg-card: #111827;
+            --bg-input: #1a2234;
+            --border: #1e2d4a;
+            --border-focus: #3b82f6;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.2);
+            --success: #10b981;
+            --text-primary: #e2e8f0;
+            --text-muted: #64748b;
+            --text-dim: #475569;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-deep);
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 8s ease-in-out infinite;
+        }
+        .orb-1 { width: 300px; height: 300px; background: #3b82f6; top: -100px; left: -50px; }
+        .orb-2 { width: 250px; height: 250px; background: #8b5cf6; bottom: -80px; right: -50px; animation-delay: -3s; }
+        .orb-3 { width: 180px; height: 180px; background: #06b6d4; top: 50%; left: 60%; animation-delay: -5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -20px) scale(1.05); }
+            66% { transform: translate(-20px, 15px) scale(0.95); }
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 420px;
+            padding: 0 20px;
+        }
+
+        /* Terminal-style header */
+        .terminal-header {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+
+        .terminal-header .cursor {
+            display: inline-block;
+            width: 7px;
+            height: 14px;
+            background: var(--accent);
+            margin-left: 4px;
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px 36px;
+            backdrop-filter: blur(20px);
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.03),
+                0 20px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 80px -20px var(--accent-glow);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.05),
+                0 25px 60px -12px rgba(0, 0, 0, 0.6),
+                0 0 100px -20px var(--accent-glow);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 8px 24px -4px var(--accent-glow);
+        }
+
+        .logo-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-subtitle {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            opacity: 0.4;
+            transition: opacity 0.2s;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .form-input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-input:focus + .icon,
+        .form-input:focus ~ .icon {
+            opacity: 1;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent), #2563eb);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1));
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px -4px var(--accent-glow);
+        }
+
+        .btn-login:hover::after { opacity: 1; }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login:disabled {
+            background: var(--text-dim);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Error & Lockout alerts */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-error {
+            background: var(--danger-glow);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .alert-locked {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #fcd34d;
+        }
+
+        .alert-locked .countdown {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #f59e0b;
+        }
+
+        /* Footer info */
+        .footer-info {
+            text-align: center;
+            margin-top: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            line-height: 1.8;
+        }
+
+        .footer-info .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 4px;
+            color: var(--accent);
+        }
+
+        /* Scan line effect */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.1;
+            animation: scan 4s linear infinite;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100vh; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="login-container">
+        <div class="terminal-header">
+            root@securelab:~$ authenticate --user<span class="cursor"></span>
+        </div>
+
+        <div class="card">
+            <div class="logo-section">
+                <div class="logo-icon">🔐</div>
+                <div class="logo-title">SecureLab</div>
+                <div class="logo-subtitle">ethical hacking platform</div>
+            </div>
+
+            {% if error %}
+                <div class="alert {% if locked %}alert-locked{% else %}alert-error{% endif %}">
+                    {% if locked %}
+                        <span>{{ error }}</span>
+                        <span class="countdown" id="countdown"></span>
+                    {% else %}
+                        <span>{{ error }}</span>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <form method="POST" action="/login" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">Usuario</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            class="form-input"
+                            placeholder="username"
+                            autocomplete="off"
+                            {% if locked %}disabled{% endif %}
+                            required
+                        >
+                        <span class="icon">👤</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-input"
+                            placeholder="••••••••"
+                            {% if locked %}disabled{% endif %}
+                            required
+                        >
+                        <span class="icon">🔑</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login" {% if locked %}disabled{% endif %}>
+                    {% if locked %}🔒 Cuenta Bloqueada{% else %}Iniciar Sesión{% endif %}
+                </button>
+            </form>
+        </div>
+
+        <div class="footer-info">
+            <span class="tag">EDUCATIONAL USE ONLY</span><br>
+            Ethical Hacking Lab v1.0 · Flask + Python
+        </div>
+    </div>
+
+    {% if locked and remaining %}
+    <script>
+        let seconds = {{ remaining }};
+        const countdownEl = document.getElementById('countdown');
+        const btn = document.querySelector('.btn-login');
+        const inputs = document.querySelectorAll('.form-input');
+
+        function updateCountdown() {
+            if (seconds > 0) {
+                const min = Math.floor(seconds / 60);
+                const sec = seconds % 60;
+                countdownEl.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+                seconds--;
+                setTimeout(updateCountdown, 1000);
+            } else {
+                location.reload();
+            }
+        }
+        updateCountdown();
+    </script>
+    {% endif %}
+</body>
+</html>
